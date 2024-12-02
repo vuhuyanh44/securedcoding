@@ -1,0 +1,91 @@
+server:
+  port: 8787
+  servlet:
+    context-path: /hrm/api
+spring:
+  config:
+    activate:
+      on-profile: prod
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${MARIADB_HOST:10.124.18.62}:3306/lgcns_hrm?useUnicode=yes&serverTimezone=Asia/Ho_Chi_Minh&characterEncoding=UTF-8
+    username: ${MARIADB_USER:root}
+    password: ${MARIADB_PASS:1}
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+#        dialect: org.hibernate.dialect.MariaDBDialect
+        connection:
+          provider_class: com.zaxxer.hikari.hibernate.HikariConnectionProvider
+  mail:
+    host: smtp.gmail.com
+    username: lgcnsvb@gmail.com
+    password: 12122012LgCNSPRO!
+    port: 587
+    properties:
+      smtp:
+        auth: true
+        timeout: 2500
+      mail:
+        smtp:
+          ssl:
+            enable: true
+  mail-imap:
+    host: ${MAIL_IMAP_HOST:imap.gmail.com}
+    port: ${MAIL_IMAP_PORT:993}
+    box: ${MAIL_IMAP_BOX:INBOX}
+    ssl: true
+    socketFactory:
+      class: ${MAIL_IMAP_SOCKET_FACTORY_CLASS:javax.net.ssl.SSLSocketFactory}
+      fallback: ${MAIL_IMAP_SOCKET_FACTORY_FALLBACK:false}
+    store:
+      protocol: ${MAIL_STORE_PROTOCOL:imap}
+    username: ${MAIL_IMAP_USERNAME:lgcnsvb@gmail.com}
+    password: ${MAIL_IMAP_PASSWORD:ahglpuagjvbupmei}
+  minio:
+    access-key: ${MINIO_ACC_KEY:admin}
+    secret-key: ${MINIO_SEC_KEY:Ab@admin}
+    end-point: http://${MINIO_HOST:10.124.18.62}:9000
+    bucket-name: hr-project
+## Logging
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+    com:
+      zaxxer:
+        hikari:
+          HikariConfig: DEBUG
+          nodeValue: TRACE
+
+
+#region hrm custom config
+
+hrm-env:
+  thread:
+    pool:
+      corePoolSize: 10
+      maxPoolSize: 200
+      queueCapacity: 10
+      awaitTerminationSeconds: 10
+  security:
+    jwt:
+      enable: true
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
+
+#end region

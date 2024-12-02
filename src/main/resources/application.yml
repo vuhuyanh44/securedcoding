@@ -1,0 +1,107 @@
+server:
+  port: 8787
+  servlet:
+    context-path: /hrm/api
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    hikari:
+      data-source-properties:
+        useServerPrepStmts: true
+        cacheServerConfiguration: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        cacheResultSetMetadata: true
+        cachePrepStmts: true
+        rewriteBatchedStatements: true
+        elideSetAutoCommits: true
+        useLocalSessionState: true
+        maintainTimeStats: false
+      idle-timeout: 300000
+      pool-name: ConnPool
+      maximum-pool-size: 10
+      connection-timeout: 50000
+      max-lifetime: 900000
+      connection-test-query: select 1 from dual
+      minimum-idle: 10
+    type: com.zaxxer.hikari.HikariDataSource
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO
+            instanceName: clusteredScheduler
+          dataSource:
+            quartzDataSource:
+              URL: ${spring.datasource.url}
+              driver: ${spring.datasource.driver-class-name}
+              user: ${spring.datasource.username}
+              password: ${spring.datasource.password}
+              provider: hikaricp
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            dataSource: quartzDataSource
+            useProperties: false
+            tablePrefix: QRTZ_
+            misfireThreshold: 60000
+            clusterCheckinInterval: 5000
+            isClustered: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+## Logging
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+    com:
+      zaxxer:
+        hikari:
+          HikariConfig: DEBUG
+          nodeValue: TRACE
+
+#region Swagger-ui custom path
+springdoc:
+  swagger-ui:
+    doc-expansion: none
+    deep-linking: true
+    filter: true
+    try-it-out-enabled: true
+    tags-sorter: alpha
+    groups-order: asc
+  writer-with-default-pretty-printer: true
+
+#endregion
+
+#region Actuator
+management:
+  server:
+    base-path: /actuator
+    port: 8788
+  health:
+    mail:
+      enabled: false
+    mysql:
+      enabled: true
+  endpoint:
+    metrics:
+      enabled: true
+#endregion
